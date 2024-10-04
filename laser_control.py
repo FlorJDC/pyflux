@@ -50,7 +50,6 @@ class Frontend(QtGui.QFrame):
     def __init__(self, *args, **kwargs):
 
         super().__init__(*args, **kwargs)
-
         self.initialDir = r'C:\Data'
         
         # Define status icons dir
@@ -134,8 +133,6 @@ class Frontend(QtGui.QFrame):
         # paramTabGrid.addWidget(self.paramWidget, 0, 0)
         paramTabGrid.addWidget(lowerWidget, 1, 0)
         paramTab.setLayout(paramTabGrid)
-        
-    # make connections between GUI and worker functions
             
     def make_connection(self, backend):
         
@@ -177,8 +174,7 @@ class Backend(QtCore.QObject):
     @pyqtSlot(dict)
     def get_frontend_param(self, params):      
         self.calculate_derived_param()
-    
-      
+          
     def calculate_derived_param(self):
         #TODO: check whether we can delete this. 
         self.viewtimer_time = 0  # timer will timeout as soon after it has executed all functions
@@ -231,12 +227,11 @@ class Backend(QtCore.QObject):
     def make_connection(self, frontend): 
         frontend.paramSignal.connect(self.get_frontend_param)
         print("done1")
-        frontend.closeSignal.connect(self.stop)
-        print("donde 2")
-
         frontend.diodelaserButton.clicked.connect(lambda: self.enableDiodelaser(frontend.diodelaserButton.isChecked()))
         frontend.diodepowerSpinBox.valueChanged.connect(lambda: self.setpowerDiodelaser(frontend.diodepowerSpinBox.value()))
-
+        frontend.closeSignal.connect(self.stop)
+        print("donde 2")
+    
     def stop(self):
         if self.laserstate:
             self.enableDiodelaser(False)
