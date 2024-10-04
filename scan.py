@@ -2107,9 +2107,10 @@ if __name__ == '__main__':
         
     #initialize devices (diode laser and AdWin board)
     
-    port = tools.get_MiniLasEvoPort()
-    print('[scan] MiniLasEvo diode laser port:', port)
-    diodelaser = MiniLasEvo(port)
+    miniLasEvoPort, miniLambdaPort = tools.get_MiniLasEvoPort()
+    print('[scan] MiniLasEvo diode laser ports:',miniLasEvoPort, miniLambdaPort)
+    diodelaser = MiniLasEvo(miniLasEvoPort)
+    diodelaser_830 = MiniLasEvo(miniLambdaPort)
     
     DEVICENUMBER = 0x1
     adw = ADwin.ADwin(DEVICENUMBER, 1)

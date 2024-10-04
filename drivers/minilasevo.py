@@ -202,7 +202,7 @@ class MiniLasEvo:
 
 if __name__ == '__main__':
 
-    port = 'COM7'
+    port = 'COM5'
     minilaser = MiniLasEvo(port)
     
     #add initialize call

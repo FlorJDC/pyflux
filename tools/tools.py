@@ -393,30 +393,48 @@ def toggle_shutter(adwBoard, num, val):
         adwBoard.Start_Process(7)
         #print('Shutter', str(num+1), 'closed')    
     
-def get_MiniLasEvoPort():
+# def get_MiniLasEvoPort():
     
-    i = 1
-    j = 1
-    wmi = win32com.client.GetObject ("winmgmts:")
-    for usb in wmi.InstancesOf ("Win32_USBHub"):
-        strid = usb.DeviceID
-#        print(strid)
-        if ('ML069719' in strid):
-            savei = i
+#     i = 1
+#     j = 1
+#     wmi = win32com.client.GetObject ("winmgmts:")
+#     for usb in wmi.InstancesOf ("Win32_USBHub"):
+#         strid = usb.DeviceID
+# #        print(strid)
+#         if ('ML069719' in strid):
+#             savei = i
             
-        if ('VID_0403&PID_6001' in strid):
-            savej = j
-        i+= 1
-        j+= 1
+#         if ('VID_0403&PID_6001' in strid):
+#             savej = j
+#         i+= 1
+#         j+= 1
        
-#    print(savei, savej)
-    if savei<savej:
-        port = 'COM7'
-    else:
-        port = 'COM3'
+# #    print(savei, savej)
+#     if savei<savej:
+#         port = 'COM3' # Minilasevo 640nm port
+#     else:
+#         port = 'COM5' # Minilambda 830nm port
     
-    return port
+#     return port
 
+def get_MiniLasEvoPort():
+    wmi = win32com.client.GetObject("winmgmts:")
+    minilasevo_port = None
+    minilambda_port = None
+
+    for usb in wmi.InstancesOf("Win32_USBHub"):
+        strid = usb.DeviceID
+        # Identificamos los dispositivos por sus IDs
+        if 'ML069719' in strid:
+            minilasevo_port = 'COM3'  # Puerto del MiniLasEvo 640nm
+        elif 'VID_0403&PID_6001' in strid:
+            minilambda_port = 'COM5'  # Puerto del MiniLambda 830nm
+    
+    # Aseguramos que se identifican ambos puertos
+    if minilasevo_port is None or minilambda_port is None:
+        raise Exception("No se han podido identificar los puertos de ambos láseres.")
+    
+    return minilasevo_port, minilambda_port
 
 class PI(object):
     """
