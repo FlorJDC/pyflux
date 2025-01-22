@@ -724,6 +724,8 @@ class Backend(QtCore.QObject):
         self.xy_filename = os.path.join(self.folder, xy_filename)
         z_filename = 'z_data'
         self.z_filename = os.path.join(self.folder, z_filename)
+        focus_filename = 'focus_data'
+        self.focus_filename = os.path.join(self.folder, focus_filename)
         # Se llama viewTimer pero es el unico para todo, no sólo para view
         # Ojo: aquí coloqué viewtimer porque es el que se usa a lo largo del
         # código, pero en xyz_tracking se usa view_timer
@@ -1160,12 +1162,20 @@ class Backend(QtCore.QObject):
         self.center_of_mass()
         xmin, xmax, ymin, ymax = self.zROIcoordinates #Better define something like: self.xmin
         self.CM_abs = [self.m_center[0] + xmin, self.m_center[1] + ymin]
-        print("CM_abs: ", self.CM_abs) # Save this value in txt or something
-        print("Reference in abs coord: self.CM_abs[0]: ", self.CM_abs[0])
+        print(f"Reference in abs coord: ({self.CM_abs[0]}, {self.CM_abs[1]})")
+        
+        filename = self.focus_filename
+        _lgr.info('Focus data exported to %s', filename)
+        tools.saveConfig_focus(xmin, ymin, xmax - xmin, self.CM_abs[0], self.CM_abs[1], 'test_focus', filename)
+        print('[xyz_focus_lock] saved configfile', filename)
         
     def set_focus(self):
-        xmin, xmax, ymin, ymax = self.zROIcoordinates
-        self.initialz = self.CM_abs[0] - xmin # To obtain coordinates relative to the new zROI
+        focus_info = tools.loadConfig_focus(self.focus_filename + ".txt")
+        _lgr.info("Focus information loaded.")
+        xmin = focus_info['x_min (px)']
+        roi_size = focus_info['roi_size (px)']
+        self.CM_abs_x = focus_info['cm_abs[0] (px)']
+        self.initialz = self.CM_abs_x - xmin # To obtain coordinates relative to the new zROI
         
     def gaussian_fit(self, roi_coordinates) -> (float, float):
         """Devuelve el centro del fiteo, en nm respecto al ROI.
@@ -1713,7 +1723,6 @@ class Backend(QtCore.QObject):
         # TODO: guardar frame final
         # self.export_image()
         filename = tools.getUniqueName(self.z_filename) + '.txt'
-
         size = self.j_z
         savedData = np.zeros((2, size))
 
